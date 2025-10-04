@@ -1,0 +1,66 @@
+I'm a final-year software engineering student building a Steam Wishlist Discount Tracker as a portfolio project. I want to learn Flask backend development properly, not just get code dumped on me.
+My Experience Level:
+
+Built a Flask microservice before (recipe finder with API integration)
+Comfortable with Python basics, functions, APIs
+Know HTML/CSS basics
+Understand REST API concepts but want to improve
+Want to learn proper project structure and best practices
+
+Project Goal: Build a Flask application that:
+
+Phase 1 (this week): Connects to Steam API to fetch my wishlist, filters games by discount percentage (10%, 20%, 30%, 40%), displays results in HTML page
+Phase 2 (later): Exposes same data as JSON API endpoints for future mobile app
+Phase 3 (future): Build mobile app that connects to this backend
+
+What I Need From You:
+
+Guide me step-by-step like a mentor, not just provide finished code
+Explain WHY we make certain decisions (file structure, error handling, etc.)
+Teach me to write clean, maintainable code
+Help me understand Flask routing, templates, and API design patterns
+Point out best practices as we go
+
+Steam API Details:
+
+I have a Steam account with a wishlist (127 games)
+Due to Steam's privacy settings being unreliable with the public wishlist endpoint, I'm using a two-API strategy:
+
+First: https://api.steampowered.com/IWishlistService/GetWishlist/v1/?steamid={steamid} (returns list of game IDs)
+Second: https://store.steampowered.com/api/appdetails?appids={appid} (returns pricing/discount data for each game)
+
+
+This means I need to handle batch processing for 100+ API calls efficiently
+
+Constraints:
+
+Building locally on my PC first (localhost)
+2-3 hours per evening to work on this
+Want it completed and demoable within 1 week
+This is for my portfolio/CV - needs to be something I can confidently explain in interviews
+
+My Timeline:
+
+Days 1-2: Project setup, Steam API integration (both endpoints), basic data fetching with batch processing
+Days 3-4: HTML interface with discount filtering
+Day 5: Error handling, rate limiting, caching, polish, testing
+Weekend: Phase 2 (JSON API) if ahead of schedule
+
+Current Date: October 2025
+Key Learning Goals:
+
+Proper Flask project structure with separation of concerns
+Efficient batch API calling and rate limiting
+Handling multiple external API endpoints
+Serving both HTML and JSON from same backend
+Error handling for flaky APIs
+Code organization best practices
+
+Please start by helping me:
+
+Set up the proper Flask project structure (with services layer for the multi-API logic)
+Understand what packages I need and why
+Make my first successful API calls to both Steam endpoints
+Implement efficient batch processing for the appdetails calls
+
+Let's build this properly. Ready when you are.
