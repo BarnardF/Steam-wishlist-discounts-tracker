@@ -39,4 +39,12 @@ A Flask-based backend service that fetches your Steam wishlist, retrieves pricin
 - **Utilities:** `time.sleep` for rate-limiting
 
 ## Project Structure
-
+STEAM_WISHLIST/
+├─ services/
+│ └── steam_service.py # Handles Steam API calls and filtering logic
+├─ .env # Stores STEAM_ID and other sensitive info
+├─ config.py # Loads environment variables
+├─ test_service.py # Unit tests for SteamService class
+├─ test_steam.py # Initial raw API testing scripts
+├─ requirements.txt # Python dependencies
+└─ README.md
