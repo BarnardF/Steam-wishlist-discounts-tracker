@@ -1,50 +1,56 @@
 # Steam Wishlist Discount Tracker
 
-A Flask-based backend service that fetches your Steam wishlist, retrieves pricing and discount information, and allows filtering by discount percentage.
-**Purpose:** Learning Flask, API integration, and backend development  
+A Flask-based microservice that tracks Steam game discounts on your wishlist. Fetches pricing data from Steam's API and filters games by discount percentage using concurrent processing.
+
+**Purpose:** Learning Flask, multi-API integration, and concurrent backend development
 
 ## What It Does
 
-- Fetches your Steam wishlist using the Steam API
-- Retrieves pricing, discount, and free game information for each title
-- Filters games based on minimum discount thresholds (10%, 20%, 30%, 40%)
-- Displays results on an HTML page (Phase 1)
-- Provides JSON data endpoints for future mobile app integration (Phase 2)
+- Fetches your Steam wishlist using your Steam ID
+- Retrieves pricing and discount data for each game via concurrent API calls
+- Filters games by discount percentage ranges (0%, 1-10%, 11-20%, etc.)
+- Reduces fetch time from ~60 seconds (sequential) to ~15 seconds (threaded)
+- Web interface for filtering and viewing discounted games (in progress)
 
 ## Features
 
-**Wishlist API Integration:**
-- Pulls your full Steam wishlist using your Steam ID
-- Handles missing price data and free-to-play games gracefully
-- Error handling for flaky or unavailable API responses
+**Multi-API Integration:**
+- Steam IWishlistService API for fetching game IDs
+- Steam App Details API for pricing and discount information
+- Handles free-to-play games, missing price data, and unreleased titles
+
+**Concurrent Processing:**
+- ThreadPoolExecutor with configurable workers (default: 10)
+- Rate limiting (0.05s delay) to respect Steam's API constraints
+- Tracks failed requests for debugging
 
 **Discount Filtering:**
-- Filter games by minimum discount
-- Returns structured game data: app ID, name, original price, current price, discount, free status
+- Filter by exact discount percentage or ranges
+- Returns structured data: app_id, name, original_price, current_price, discount_percent, is_free
 
-**Batch Processing with Rate Limiting:**
-- Sequential API calls with sleep intervals to avoid Steam rate limits
-- Tracks failed API requests for debugging and retries
-
-**Web Interface (Phase 1):**
-- Simple HTML display of wishlist games
-- Ready for expansion into JSON endpoints for mobile apps
+**Error Handling:**
+- Network timeout handling
+- JSON parsing error recovery
+- Graceful degradation when games can't be fetched
 
 ## Tech Stack
 
-- **Backend:** Flask (Python)
+- **Backend:** Flask (Python 3.8+)
+- **Concurrency:** concurrent.futures.ThreadPoolExecutor
 - **External API:** Steam Web API
-- **HTTP Requests:** `requests` library
-- **Configuration:** `python-dotenv` for environment variables
-- **Utilities:** `time.sleep` for rate-limiting
+- **Configuration:** python-dotenv for environment variables
 
-## Project Structure
-STEAM_WISHLIST/
-├─ services/
-│ └── steam_service.py # Handles Steam API calls and filtering logic
-├─ .env # Stores STEAM_ID and other sensitive info
-├─ config.py # Loads environment variables
-├─ test_service.py # Unit tests for SteamService class
-├─ test_steam.py # Initial raw API testing scripts
-├─ requirements.txt # Python dependencies
-└─ README.md
+## Technology Stack
+
+**Current (Phase 1):**
+- Flask backend with HTML templates (Jinja2)
+- Vanilla JavaScript for interactivity
+
+**Planned (Phase 2):**
+- React web frontend (optional)
+- RESTful JSON API endpoints
+
+**Future (Phase 3):**
+- React Native mobile app (iOS/Android)
+- Or Flutter mobile app
+- Connects to Flask backend over local network
