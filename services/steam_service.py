@@ -1,6 +1,7 @@
 import requests, json
 from time import sleep
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class SteamService:
     def __init__(self, steam_id):
@@ -31,6 +32,10 @@ class SteamService:
             response = requests.get(url)
             data = response.json()
 
+            if not data or str(app_id) not in data:
+                print(f"No data for app_id {app_id}")
+                return None
+            
             #game data
             game_data = data[str(app_id)]
 
@@ -63,51 +68,84 @@ class SteamService:
                 'is_free': game_info.get('is_free', False)        
             }
         except requests.RequestException as e:
-            print(f"Error fetching game_details: {e}")
-            return {}
+            print(f"Error fetching game_details for {app_id}: {e}")
+            return None
+        except (ValueError, TypeError) as e:
+            print(f"Json pasring error for {app_id}: e")
+            return None
+
+    # def get_all_games(self):
+    #     game_list = []
+    #     failed_ids = []
+    #     wishlist_ids = self.get_wishlist_ids()
+
+    #     if not wishlist_ids:
+    #         return game_list
         
-    def get_all_games(self):
-        game_list = []
-        failed_ids = []
+    #     total = len(wishlist_ids)
+    #     print(f"Fetching {total} games from steam api")
+
+    #     for index, app_id in enumerate(wishlist_ids, 1):
+    #         print(f"{index}/{total} fetching {app_id}", end='/r')
+
+    #         game_data = self.get_game_details(app_id)
+
+    #         if game_data:
+    #             game_list.append(game_data)
+    #         else:
+    #             failed_ids.append(app_id)
+
+    #         sleep(0.5)
+
+    #     print(f"Fetched {len(game_list)} games")
+    #     if failed_ids:
+    #         print(f"Failed fetching {len(failed_ids)} games: {failed_ids[:5]}...")
+
+    #     return game_list
+
+    #     # for id in wishlist_ids:
+    #     #     game_data = self.get_game_details(id)
+    #     #     game_list.append(game_data)
+    #     #     sleep(1)
+    #     # return game_list
+
+    def get_all_games(self, max_workers = 10):
         wishlist_ids = self.get_wishlist_ids()
 
         if not wishlist_ids:
-            return game_list
+            return []
         
+        game_list = []
         total = len(wishlist_ids)
-        print(f"Fetching {total} games from steam api")
+        print(f"Fetching {total} games, using {max_workers} threads")
 
-        for index, app_id in enumerate(wishlist_ids, 1):
-            print(f"{index}/{total} fetching {app_id}", end='/r')
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_id = {
+                executor.submit(self.get_game_details, app_id): app_id #2
+                for app_id in wishlist_ids #1
+            }
 
-            game_data = self.get_game_details(app_id)
+            for index, future in enumerate(as_completed(future_to_id), 1):
+                print(f"[{index}/{total}] completed", end='\r')
 
-            if game_data:
-                game_list.append(game_data)
-            else:
-                failed_ids.append(app_id)
+                game_data = future.result()
+                if game_data:
+                    game_list.append(game_data)
 
-            sleep(0.5)
+                sleep(0.05)
+        
+        print(f"\n successfully fetched {len(game_list)} games")
+        return game_list 
 
-        print(f"Fetched {len(game_list)} games")
-        if failed_ids:
-            print(f"Failed fetching {len(failed_ids)} games: {failed_ids[:5]}...")
 
-        return game_list
-
-        # for id in wishlist_ids:
-        #     game_data = self.get_game_details(id)
-        #     game_list.append(game_data)
-        #     sleep(1)
-        # return game_list
-    
-    def filter_by_discount(self, games, min_discount = 0):
+    def filter_by_discount_range(self, games, min_discount = 0, max_discount = 100):
         discounted_games = []
         if not games:
             return discounted_games
         
         for game in games:
-            if game.get('discount_percent', 0) >= min_discount:
+            if min_discount <= game.get('discount_percent', 0) <= max_discount:
                 discounted_games.append(game)  
 
         return discounted_games     
+    
