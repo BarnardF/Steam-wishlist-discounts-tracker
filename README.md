@@ -45,12 +45,3 @@ A Flask-based microservice that tracks Steam game discounts on your wishlist. Fe
 **Current (Phase 1):**
 - Flask backend with HTML templates (Jinja2)
 - Vanilla JavaScript for interactivity
-
-**Planned (Phase 2):**
-- React web frontend (optional)
-- RESTful JSON API endpoints
-
-**Future (Phase 3):**
-- React Native mobile app (iOS/Android)
-- Or Flutter mobile app
-- Connects to Flask backend over local network
