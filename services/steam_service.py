@@ -30,7 +30,7 @@ class SteamService:
         url = self.appdetails_url.format(app_id) + f"&cc={self.country_code}&l=en"
     
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=30)
             data = response.json()
 
             if not data or str(app_id) not in data:
