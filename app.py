@@ -3,7 +3,9 @@ from services.steam_service import SteamService
 from config import Config
 
 app = Flask(__name__)
-steam_service = SteamService(Config.STEAM_ID)
+steam_service = SteamService(Config.STEAM_ID, country_code="ZA")
+
+
 
 @app.route('/')
 def index():
