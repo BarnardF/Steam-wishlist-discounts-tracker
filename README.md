@@ -1,47 +1,115 @@
 # Steam Wishlist Discount Tracker
 
-A Flask-based microservice that tracks Steam game discounts on your wishlist. Fetches pricing data from Steam's API and filters games by discount percentage using concurrent processing.
+A Flask-based web application that tracks discounts on your Steam wishlist. Uses concurrent API calls to fetch real-time pricing data and provides filtering by discount percentage.
 
-**Purpose:** Learning Flask, multi-API integration, and concurrent backend development
+**Purpose:** Portfolio project demonstrating Flask backend development, multi-API integration, concurrent processing, and full-stack web development.
+
+![index.html](image.png)
+![30% - 70% discount](image-1.png)
 
 ## What It Does
 
-- Fetches your Steam wishlist using your Steam ID
-- Retrieves pricing and discount data for each game via concurrent API calls
-- Filters games by discount percentage ranges (0%, 1-10%, 11-20%, etc.)
-- Reduces fetch time from ~60 seconds (sequential) to ~15 seconds (threaded)
-- Web interface for filtering and viewing discounted games (in progress)
+- Fetches your Steam wishlist using Steam's IWishlistService API
+- Retrieves real-time pricing and discount data for each game
+- Filters games by discount percentage ranges (10%-20%, 30%-50%, etc.)
+- Displays results in a clean web interface
+- Uses concurrent processing to fetch 100+ games in ~15 seconds
 
-## Features
+## Key Features
 
-**Multi-API Integration:**
-- Steam IWishlistService API for fetching game IDs
-- Steam App Details API for pricing and discount information
-- Handles free-to-play games, missing price data, and unreleased titles
+**Multi-API Integration**
+- Steam IWishlistService API for wishlist data
+- Steam App Details API for pricing information
+- Region-specific pricing (ZAR/South Africa)
+- Handles edge cases: free games, unreleased titles, missing data
 
-**Concurrent Processing:**
-- ThreadPoolExecutor with configurable workers (default: 10)
-- Rate limiting (0.05s delay) to respect Steam's API constraints
-- Tracks failed requests for debugging
+**Concurrent Processing**
+- ThreadPoolExecutor for parallel API calls
+- Configurable worker threads (default: 10)
+- Rate limiting to respect Steam's API constraints
+- ~75% faster than sequential processing
 
-**Discount Filtering:**
-- Filter by exact discount percentage or ranges
-- Returns structured data: app_id, name, original_price, current_price, discount_percent, is_free
+**Smart Filtering**
+- Filter by discount ranges (0-100%)
+- Automatic sorting by discount percentage
+- Excludes unreleased games from results
+- Shows both original and discounted prices
 
-**Error Handling:**
+**Caching**
+- Application-level caching for instant subsequent requests
+- No redundant API calls during active session
+- First load: ~15 seconds, subsequent: instant
+
+**Error Handling**
 - Network timeout handling
-- JSON parsing error recovery
-- Graceful degradation when games can't be fetched
+- JSON parsing validation
+- Partial result returns (doesn't crash if some games fail)
+- Graceful degradation
 
 ## Tech Stack
 
 - **Backend:** Flask (Python 3.8+)
 - **Concurrency:** concurrent.futures.ThreadPoolExecutor
-- **External API:** Steam Web API
-- **Configuration:** python-dotenv for environment variables
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript
+- **APIs:** Steam Web API (IWishlistService + App Details)
+- **Configuration:** python-dotenv
 
-## Technology Stack
+## Project Structure
+```
+steam-wishlist-tracker/
+├── app.py                      # Flask application & routes
+├── config.py                   # Configuration management
+├── services/
+│   └── steam_service.py        # Steam API integration
+├── templates/
+│   ├── index.html              # Filter form
+│   └── wishlist.html           # Results display
+├── .env                        # Steam ID (not committed)
+├── requirements.txt
+└── README.md
+```
 
-**Current (Phase 1):**
-- Flask backend with HTML templates (Jinja2)
-- Vanilla JavaScript for interactivity
+## Getting Started
+
+### Prerequisites
+- Python 3.8+
+- Steam account with games in wishlist
+- Your Steam ID (find at https://steamid.io/)
+
+### Installation
+```bash
+# Clone repository
+git clone <your-repo-url>
+cd steam-wishlist-tracker
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
+echo "STEAM_ID=your_steam_id_here" > .env
+
+# Run application
+python app.py
+```
+
+### Usage
+- **Visit** http://localhost:5000
+
+
+### Technical Decisions
+## Why Threading?
+Sequential API calls took ~60 seconds for 127 games. Threading with 10 workers reduced this to ~15 seconds while respecting rate limits.
+
+### Why Application-Level Cache?
+Steam prices don't change every second. Caching eliminates redundant API calls during active sessions, improving UX.
+
+### Region Handling:
+Added cc=ZA parameter to ensure correct currency (ZAR) instead of defaulting to USD.
+
+## License
+
+Personal learning project - feel free to reference or adapt for educational purposes.
