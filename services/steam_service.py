@@ -4,8 +4,9 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class SteamService:
-    def __init__(self, steam_id):
+    def __init__(self, steam_id, country_code = "ZA"):
         self.steam_id = steam_id
+        self.country_code = (country_code or "ZA").upper()
         self.wishlist_url = f"https://api.steampowered.com/IWishlistService/GetWishlist/v1/?steamid={steam_id}"
         self.appdetails_url = "https://store.steampowered.com/api/appdetails?appids={}"
 
@@ -26,10 +27,10 @@ class SteamService:
             return []
         
     def get_game_details(self, app_id):
-        url = self.appdetails_url.format(app_id)
+        url = self.appdetails_url.format(app_id) + f"&cc={self.country_code}&l=en"
     
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
             data = response.json()
 
             if not data or str(app_id) not in data:
