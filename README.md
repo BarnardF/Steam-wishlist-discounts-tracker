@@ -100,13 +100,12 @@ python app.py
 - **Visit** http://localhost:5000
 
 
-### Technical Decisions
+### Technical Decisions:
+
 ### Why Threading?
 Sequential API calls took ~60 seconds for 127 games. Threading with 10 workers reduced this to ~15 seconds while respecting rate limits.
-
 ### Why Application-Level Cache?
 Steam prices don't change every second. Caching eliminates redundant API calls during active sessions, improving UX.
-
 ### Region Handling:
 Added cc=ZA parameter to ensure correct currency (ZAR) instead of defaulting to USD.
 
