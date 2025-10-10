@@ -101,7 +101,7 @@ python app.py
 
 
 ### Technical Decisions
-## Why Threading?
+### Why Threading?
 Sequential API calls took ~60 seconds for 127 games. Threading with 10 workers reduced this to ~15 seconds while respecting rate limits.
 
 ### Why Application-Level Cache?
