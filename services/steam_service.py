@@ -45,18 +45,34 @@ class SteamService:
             game_info = game_data['data']
 
             if 'price_overview' not in game_info:
-                return {
-                    'app_id': app_id,
-                    'name': game_info['name'],
-                    'original_price': 0.0,
-                    'current_price': 0.0,
-                    'discount_percent': 0,
-                    'is_free': game_info.get('is_free', True)
-                }
+                release_info = game_info.get('release_date', {})
+                if release_info.get('coming_soon', False):
+                    #unreleased
+                    return {
+                        'app_id': app_id,
+                        'name': game_info['name'],
+                        'original_price': None,
+                        'current_price': None,
+                        'discount_percent': None,
+                        'is_free': False,
+                        'status': 'Unreleased'
+                    }
+                else:
+                    #free to play
+                    return {
+                        'app_id': app_id,
+                        'name': game_info['name'],
+                        'original_price': 0.0,
+                        'current_price': 0.0,
+                        'discount_percent': 0,
+                        'is_free': game_info.get('is_free', True),
+                        'status': 'Free'
+                    }
             
+            #game has pricing
             price_info = game_info['price_overview']
             original = price_info['initial'] / 100
-            current = price_info['final'] /100
+            current = price_info['final'] / 100
             discount = price_info['discount_percent']
             
             return {
@@ -65,13 +81,14 @@ class SteamService:
                 'original_price': original,
                 'current_price': current,
                 'discount_percent': discount,
-                'is_free': game_info.get('is_free', False)        
+                'is_free': game_info.get('is_free', False),
+                'status': 'Available'    
             }
         except requests.RequestException as e:
             print(f"Error fetching game_details for {app_id}: {e}")
             return None
         except (ValueError, TypeError) as e:
-            print(f"Json pasring error for {app_id}: e")
+            print(f"Json pasring error for {app_id}: {e}")
             return None
 
     # def get_all_games(self):
@@ -139,13 +156,19 @@ class SteamService:
 
 
     def filter_by_discount_range(self, games, min_discount = 0, max_discount = 100):
-        discounted_games = []
+        filtered = []
         if not games:
-            return discounted_games
+            return filtered
         
         for game in games:
-            if min_discount <= game.get('discount_percent', 0) <= max_discount:
-                discounted_games.append(game)  
+            discount = game.get('discount_percent')
+            if discount is None:
+                continue
 
-        return discounted_games     
+            if min_discount <= discount <= max_discount:
+                filtered.append(game)    
+            # if min_discount <= game.get('discount_percent', 0) <= max_discount:
+            #     discounted_games.append(game)  
+
+        return filtered     
     
