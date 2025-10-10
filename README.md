@@ -110,6 +110,11 @@ Steam prices don't change every second. Caching eliminates redundant API calls d
 ### Region Handling:
 Added cc=ZA parameter to ensure correct currency (ZAR) instead of defaulting to USD.
 
+
+## Acknowledgment
+
+This README was created with the assistance of AI (ChatGPT by OpenAI) to ensure clarity and consistency.
+
 ## License
 
 Personal learning project - feel free to reference or adapt for educational purposes.
